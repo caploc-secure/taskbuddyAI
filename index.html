@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskBuddy AI — Automation that runs itself</title>
+<meta name="description" content="Custom AI agents that handle your business's mundane, everyday tasks — built for you, run quietly in the background, maintained by us.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #FF5D3A;
+    --coral-dark: #E5471F;
+    --violet: #4B2EDB;
+    --violet-deep: #2E1B8C;
+    --mint: #1FD9A8;
+    --ink: #15142B;
+    --ink-soft: #4A4864;
+    --base: #FAFAFC;
+    --base-warm: #F4F2FA;
+    --line: #E5E3F0;
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    background: var(--base);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+
+  /* ---------- NAV ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(250, 250, 252, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+  .logo-mark {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    background: #3E9B2F;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width: 18px; height: 18px; }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    background: var(--ink);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .nav-cta:hover { background: var(--violet); transform: translateY(-1px); }
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    padding: 88px 0 64px;
+    overflow: hidden;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; }
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--base-warm);
+    border: 1px solid var(--line);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--violet);
+    margin-bottom: 22px;
+  }
+  .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    margin-bottom: 22px;
+  }
+  .hero h1 .accent { color: var(--coral); }
+
+  .hero p.lede {
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin-bottom: 34px;
+  }
+
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  .btn-primary {
+    background: var(--coral);
+    color: white;
+    padding: 15px 28px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.98rem;
+    display: inline-block;
+    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 8px 20px -8px rgba(255, 93, 58, 0.55);
+  }
+  .btn-primary:hover { background: var(--coral-dark); transform: translateY(-2px); }
+
+  .btn-secondary {
+    background: white;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    padding: 15px 28px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.98rem;
+    display: inline-block;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .btn-secondary:hover { border-color: var(--violet); transform: translateY(-2px); }
+
+  /* Signature: task-automation animation */
+  .hands-stage {
+    position: relative;
+    height: 480px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: visible;
+  }
+  .flow-stage {
+    position: relative;
+    width: 100%;
+    max-width: 660px;
+    height: 460px;
+  }
+  .flow-lane {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--line);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .flow-core {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 132px; height: 132px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--coral));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 12px rgba(75,46,219,0.08), 0 24px 48px -16px rgba(75,46,219,0.5);
+    animation: pulse 2.6s ease-in-out infinite;
+    z-index: 3;
+  }
+  .flow-core svg { width: 54px; height: 54px; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 12px rgba(75,46,219,0.08), 0 24px 48px -16px rgba(75,46,219,0.5); }
+    50% { box-shadow: 0 0 0 22px rgba(75,46,219,0.14), 0 24px 48px -16px rgba(75,46,219,0.6); }
+  }
+  .flow-card {
+    position: absolute;
+    top: 50%;
+    width: 168px;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 12px 26px -12px rgba(21,20,43,0.18);
+    display: flex; align-items: center; gap: 12px;
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    left: -8px;
+    animation: travel 6s cubic-bezier(.5,0,.5,1) infinite;
+  }
+  .flow-card .dot { width: 24px; height: 24px; border-radius: 7px; flex-shrink: 0; }
+  .flow-card.c1 { animation-delay: 0s; }
+  .flow-card.c2 { animation-delay: -2s; }
+  .flow-card.c3 { animation-delay: -4s; }
+  @keyframes travel {
+    0%   { transform: translate(0, -50%) scale(1); opacity: 0; }
+    8%   { opacity: 1; }
+    42%  { transform: translate(235px, -50%) scale(0.94); opacity: 1; }
+    50%  { transform: translate(252px, -50%) scale(0.5); opacity: 0; }
+    51%  { transform: translate(252px, -50%) scale(0.5); opacity: 0; }
+    58%  { opacity: 1; transform: translate(272px, -50%) scale(0.7); }
+    100% { transform: translate(540px, -50%) scale(1); opacity: 1; }
+  }
+  .flow-done {
+    position: absolute;
+    right: -6px; top: 50%;
+    transform: translateY(-50%);
+    display: flex; align-items: center; gap: 9px;
+    font-size: 1.02rem; font-weight: 700;
+    color: #0FA57F;
+    opacity: 0;
+    animation: doneblink 6s ease-in-out infinite;
+  }
+  @keyframes doneblink {
+    0%, 60% { opacity: 0; }
+    64%, 92% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* ---------- PROBLEM ---------- */
+  .problem {
+    background: var(--ink);
+    color: white;
+    padding: 72px 0;
+  }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 760px) { .problem-grid { grid-template-columns: 1fr; } }
+  .problem h2 {
+    font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+    color: white;
+  }
+  .problem .lede {
+    color: rgba(255,255,255,0.65);
+    font-size: 1.05rem;
+    margin-top: 16px;
+  }
+  .problem-list { display: flex; flex-direction: column; gap: 22px; }
+  .problem-item { display: flex; gap: 16px; align-items: flex-start; }
+  .problem-item .mark {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: var(--coral);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; margin-top: 2px;
+  }
+  .problem-item p { color: rgba(255,255,255,0.85); font-size: 1rem; }
+  .problem-item strong { color: white; }
+
+  /* ---------- SERVICES ---------- */
+  .services { padding: 88px 0; }
+  .section-head { max-width: 560px; margin-bottom: 48px; }
+  .section-head .eyebrow { margin-bottom: 16px; }
+  .section-head h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+  .section-head p { color: var(--ink-soft); font-size: 1.05rem; margin-top: 14px; }
+
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 700px) { .service-grid { grid-template-columns: 1fr; } }
+
+  .service-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 30px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px -20px rgba(21, 20, 43, 0.25);
+    border-color: transparent;
+  }
+  .service-icon {
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+  }
+  .service-icon svg { width: 20px; height: 20px; }
+  .service-card h3 { font-size: 1.15rem; margin-bottom: 10px; }
+  .service-card p { color: var(--ink-soft); font-size: 0.95rem; }
+
+  .ic-1 { background: rgba(255,93,58,0.12); color: var(--coral); }
+  .ic-2 { background: rgba(75,46,219,0.12); color: var(--violet); }
+  .ic-3 { background: rgba(31,217,168,0.14); color: #0FA57F; }
+  .ic-4 { background: rgba(21,20,43,0.08); color: var(--ink); }
+
+  /* ---------- DOCUMENT DEMO ---------- */
+  .doc-demo { padding: 88px 0; background: var(--base-warm); }
+  .doc-grid {
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 48px;
+    align-items: center;
+  }
+  @media (max-width: 860px) { .doc-grid { grid-template-columns: 1fr; } }
+
+  .doc-copy h2 { font-size: clamp(1.7rem, 3.4vw, 2.3rem); margin-bottom: 16px; }
+  .doc-copy p { color: var(--ink-soft); font-size: 1.02rem; margin-bottom: 22px; max-width: 440px; }
+  .doc-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .doc-tag {
+    font-size: 0.82rem; font-weight: 600;
+    background: white; border: 1px solid var(--line);
+    padding: 7px 14px; border-radius: 999px; color: var(--ink-soft);
+  }
+
+  .doc-stage {
+    position: relative;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 26px;
+    min-height: 300px;
+    box-shadow: 0 24px 48px -28px rgba(21,20,43,0.18);
+  }
+  .doc-pile-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: start;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 480px) { .doc-pile-row { grid-template-columns: 1fr; } }
+
+  .doc-pile { position: relative; height: 118px; }
+  .doc-results { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; }
+  .doc-result-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+    background: var(--base-warm);
+    border-radius: 8px;
+    padding: 8px 10px;
+    opacity: 0;
+    transform: translateY(4px);
+    animation: resultfade 5.5s ease-in-out infinite;
+  }
+  .doc-result-row.r2 { animation-delay: 0.35s; }
+  .doc-result-row .r-label { font-size: 0.76rem; font-weight: 600; color: var(--ink); }
+  .doc-result-row .r-days {
+    font-size: 0.7rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 999px;
+    background: rgba(255,93,58,0.14); color: var(--coral-dark);
+    white-space: nowrap;
+  }
+  @keyframes resultfade {
+    0%, 42% { opacity: 0; transform: translateY(4px); }
+    52%, 100% { opacity: 1; transform: translateY(0); }
+  }
+  .doc-sheet {
+    position: absolute;
+    top: 0; left: 50%;
+    width: 84px; height: 108px;
+    background: white;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 6px 14px -8px rgba(21,20,43,0.25);
+    transform: translateX(-50%);
+  }
+  .doc-sheet.s1 { transform: translateX(-70px) rotate(-6deg); }
+  .doc-sheet.s2 { transform: translateX(-50%) rotate(2deg); z-index: 2; }
+  .doc-sheet.s3 { transform: translateX(14px) rotate(7deg); }
+  .doc-sheet .line { height: 6px; background: var(--line); border-radius: 3px; margin: 12px 10px; }
+  .doc-sheet .line.short { width: 40%; }
+
+  .scan-bar {
+    position: absolute;
+    left: 12px; right: 12px;
+    top: 0;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--mint), var(--violet), transparent);
+    animation: scan 5.5s ease-in-out infinite;
+    box-shadow: 0 0 14px 2px rgba(31,217,168,0.5);
+  }
+  @keyframes scan {
+    0%   { top: 4px; opacity: 0; }
+    8%   { opacity: 1; }
+    38%  { top: 108px; opacity: 1; }
+    46%  { opacity: 0; }
+    100% { opacity: 0; top: 4px; }
+  }
+
+  .qa-block { border-top: 1px dashed var(--line); padding-top: 18px; min-height: 74px; }
+  .qa-question {
+    display: inline-block;
+    background: var(--base-warm);
+    border-radius: 10px 10px 10px 2px;
+    padding: 9px 14px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--ink);
+    opacity: 0;
+    animation: qafade 5.5s ease-in-out infinite;
+  }
+  .qa-answer {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 12px;
+    font-size: 0.86rem;
+    color: #0FA57F;
+    font-weight: 600;
+    opacity: 0;
+    animation: ansfade 5.5s ease-in-out infinite;
+  }
+  @keyframes qafade {
+    0%, 46% { opacity: 0; transform: translateY(4px); }
+    56%, 100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ansfade {
+    0%, 68% { opacity: 0; transform: translateY(4px); }
+    80%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .how { background: var(--base-warm); padding: 88px 0; }
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    position: relative;
+  }
+  @media (max-width: 860px) { .how-grid { grid-template-columns: 1fr 1fr; gap: 28px; } }
+  @media (max-width: 520px) { .how-grid { grid-template-columns: 1fr; } }
+
+  .how-step { padding: 0 20px 0 0; position: relative; }
+  .how-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--coral);
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+    display: block;
+  }
+  .how-step h3 { font-size: 1.08rem; margin-bottom: 8px; }
+  .how-step p { color: var(--ink-soft); font-size: 0.92rem; }
+
+  /* ---------- PRICING ---------- */
+  .pricing { padding: 88px 0; }
+  .price-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 760px) { .price-grid { grid-template-columns: 1fr; } }
+
+  .price-card {
+    border-radius: 20px;
+    padding: 36px;
+    border: 1px solid var(--line);
+    background: white;
+  }
+  .price-card.featured {
+    background: var(--ink);
+    color: white;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .price-card.featured::before {
+    content: "";
+    position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,93,58,0.35), transparent 70%);
+  }
+  .price-tag { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--violet); margin-bottom: 10px; }
+  .price-card.featured .price-tag { color: var(--mint); }
+  .price-card h3 { font-size: 1.5rem; margin-bottom: 6px; }
+  .price-amount { font-family: 'Space Grotesk', sans-serif; font-size: 2.4rem; font-weight: 700; margin: 18px 0 6px; }
+  .price-amount span { font-size: 1rem; font-weight: 500; color: var(--ink-soft); }
+  .price-card.featured .price-amount span { color: rgba(255,255,255,0.6); }
+  .price-desc { color: var(--ink-soft); font-size: 0.95rem; margin-bottom: 26px; }
+  .price-card.featured .price-desc { color: rgba(255,255,255,0.7); }
+  .price-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+  .price-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.93rem; }
+  .price-list li::before {
+    content: "";
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--coral);
+    margin-top: 7px; flex-shrink: 0;
+  }
+  .price-card.featured .price-list li::before { background: var(--mint); }
+
+  .mini-form { display: flex; flex-direction: column; gap: 10px; }
+  .mini-form textarea {
+    resize: vertical;
+    min-height: 68px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: white;
+  }
+  .price-card.featured .mini-form textarea {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.25);
+    color: white;
+  }
+  .price-card.featured .mini-form textarea::placeholder { color: rgba(255,255,255,0.5); }
+  .mini-form textarea:focus { outline: none; border-color: var(--coral); }
+  .mini-form button { cursor: pointer; border: none; }
+  .mini-note { font-size: 0.78rem; color: var(--ink-soft); }
+  .price-card.featured .mini-note { color: rgba(255,255,255,0.55); }
+
+  /* ---------- CTA BAND ---------- */
+  .cta-band {
+    background: linear-gradient(120deg, var(--violet), var(--violet-deep));
+    color: white;
+    padding: 72px 0;
+    text-align: center;
+  }
+  .cta-band h2 { font-size: clamp(1.7rem, 3.6vw, 2.4rem); color: white; margin-bottom: 16px; }
+  .cta-band p { color: rgba(255,255,255,0.75); max-width: 480px; margin: 0 auto 30px; font-size: 1.02rem; }
+
+  /* ---------- FOOTER ---------- */
+  footer { padding: 56px 0 40px; }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 32px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  @media (max-width: 700px) { .footer-grid { grid-template-columns: 1fr; } }
+  .footer-brand p { color: var(--ink-soft); font-size: 0.92rem; margin-top: 12px; max-width: 280px; }
+  .footer-col h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 14px; }
+  .footer-col p, .footer-col address { font-style: normal; color: var(--ink); font-size: 0.92rem; line-height: 1.6; margin-bottom: 16px; }
+  .footer-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 0.85rem; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M8 13V6.5a1.5 1.5 0 0 1 3 0V11" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 11V4.8a1.5 1.5 0 0 1 3 0V11" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 11.2V6.3a1.5 1.5 0 0 1 3 0V13" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13c-1.6-1.1-3.2-.6-3.6.6-.5 1.4.7 2 1.6 2.7l3 2.4c1 .8 2.2 1.3 3.5 1.3h1.8c2.4 0 4.2-1.9 4.2-4.3V9.7a1.4 1.4 0 0 0-2.8 0" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      TaskBuddy AI
+    </div>
+    <nav class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a href="#contact" class="nav-cta">Book a call</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow"><span class="eyebrow-dot"></span> AI agents, built for your business</div>
+      <h1>The mundane stuff, <span class="accent">handled</span> — quietly, in the background.</h1>
+      <p class="lede">We build and run custom AI agents that take the repetitive tasks off your plate — no new software to learn, no dashboards to babysit. Just fewer things on your list.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn-primary">Book a free consult</a>
+        <a href="#services" class="btn-secondary">See what we automate</a>
+      </div>
+    </div>
+    <div class="hands-stage">
+      <div class="flow-stage">
+        <div class="flow-lane"></div>
+        <div class="flow-card c1"><span class="dot" style="background:#4B2EDB"></span>Booking reminder</div>
+        <div class="flow-card c2"><span class="dot" style="background:#FF5D3A"></span>Follow-up email</div>
+        <div class="flow-card c3"><span class="dot" style="background:#1FD9A8"></span>Open slots</div>
+        <div class="flow-core">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="white"/></svg>
+        </div>
+        <div class="flow-done">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#0FA57F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sent
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="doc-demo">
+  <div class="wrap doc-grid">
+    <div class="doc-copy">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> Documents & data</div>
+      <h2>Scan the paperwork. Ask it questions.</h2>
+      <p>Receipts, invoices, intake forms — feed them in as they come, and just ask what you need to know. No more digging through folders to find one number.</p>
+      <div class="doc-tags">
+        <span class="doc-tag">Receipts</span>
+        <span class="doc-tag">Invoices</span>
+        <span class="doc-tag">Intake forms</span>
+        <span class="doc-tag">Contracts</span>
+      </div>
+    </div>
+    <div class="doc-stage">
+      <div class="doc-pile-row">
+        <div class="doc-pile">
+          <div class="scan-bar"></div>
+          <div class="doc-sheet s1"><div class="line"></div><div class="line short"></div><div class="line"></div></div>
+          <div class="doc-sheet s2"><div class="line"></div><div class="line"></div><div class="line short"></div></div>
+          <div class="doc-sheet s3"><div class="line short"></div><div class="line"></div><div class="line"></div></div>
+        </div>
+        <div class="doc-results">
+          <div class="doc-result-row r1">
+            <span class="r-label">Due date to file</span>
+            <span class="r-days">12 days</span>
+          </div>
+          <div class="doc-result-row r2">
+            <span class="r-label">Pay Vendor X</span>
+            <span class="r-days">5 days</span>
+          </div>
+        </div>
+      </div>
+      <div class="qa-block">
+        <div class="qa-question">"What's the total for March?"</div>
+        <div class="qa-answer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#0FA57F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          $2,340 across 12 receipts
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="problem">
+  <div class="wrap problem-grid">
+    <div>
+      <h2>You didn't start a business to manage ten different apps.</h2>
+      <p class="lede">Most small business owners end up stitching together a scheduling tool, a texting tool, a spreadsheet, and a reminder app — just to keep one task running. There's a simpler way.</p>
+    </div>
+    <div class="problem-list">
+      <div class="problem-item">
+        <div class="mark">✕</div>
+        <p><strong>Too many tools, none of them talking to each other.</strong> You're the one connecting the dots between apps that were never built to work together.</p>
+      </div>
+      <div class="problem-item">
+        <div class="mark">✕</div>
+        <p><strong>The task is simple, but doing it every day isn't.</strong> Checking availability, sending reminders, following up — small, repeated, and easy to forget.</p>
+      </div>
+      <div class="problem-item">
+        <div class="mark">✕</div>
+        <p><strong>Off-the-shelf software makes you fit its workflow.</strong> We build around how you already work, not the other way around.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> What we build</div>
+      <h2>Built around your task, not a template.</h2>
+      <p>Every business is different, so every agent starts from a conversation about what's actually eating your time — not a template.</p>
+    </div>
+    <div class="service-grid">
+      <div class="service-card">
+        <div class="service-icon ic-1"><svg viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/></svg></div>
+        <h3>Scheduling & availability</h3>
+        <p>Openings, cancellations, and reminders sent out automatically — pulled straight from the booking system you already use.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon ic-2"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Client communication</h3>
+        <p>Follow-ups, review requests, and re-engagement messages that sound like you — sent on schedule, without you drafting a word.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon ic-3"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
+        <h3>Document & data tasks</h3>
+        <p>Sorting, extracting, and organizing the paperwork that piles up — invoices, forms, intake documents — turned into something usable.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon ic-4"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Custom, whatever it is</h3>
+        <p>If it's repetitive, rule-based, and eating your time — tell us about it. Odds are we can build an agent for it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> The process</div>
+      <h2>Four steps, then it's off your plate.</h2>
+    </div>
+    <div class="how-grid">
+      <div class="how-step">
+        <span class="how-num">01</span>
+        <h3>We talk</h3>
+        <p>A short call about what task you want gone — no jargon, just what's slowing you down.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-num">02</span>
+        <h3>We build</h3>
+        <p>A working agent for your exact task, built around the tools you already use.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-num">03</span>
+        <h3>It runs</h3>
+        <p>Quietly, on its own schedule — no dashboard to check, no new app to log into.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-num">04</span>
+        <h3>We maintain it</h3>
+        <p>If something changes upstream, we catch it and fix it — that's what the retainer covers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> Simple pricing</div>
+      <h2>Small task or bigger build — priced to match.</h2>
+      <p>Every project is scoped after we talk — these are starting points, not a menu.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card featured">
+        <div class="price-tag">Simple automations</div>
+        <h3>Build it into the subscription</h3>
+        <div class="price-amount">$20<span>/mo and up</span></div>
+        <p class="price-desc">For small, well-defined tasks — the kind that eat a few minutes every day or week. No separate build fee: the build cost is folded into your monthly rate.</p>
+        <ul class="price-list">
+          <li>No upfront cost to get started</li>
+          <li>Built, tested, and maintained under one monthly rate</li>
+          <li>Fits any repetitive, well-defined task your business runs</li>
+          <li>Cancel anytime — no long build to walk away from</li>
+        </ul>
+        <form class="mini-form" data-tier="Simple automations">
+          <textarea placeholder="Tell us in a few words what you need" required></textarea>
+          <button type="submit" class="btn-primary" style="background:white; color:var(--ink); width:100%; text-align:center; border:none;">Send</button>
+        </form>
+      </div>
+      <div class="price-card">
+        <div class="price-tag">Big projects</div>
+        <h3>Build fee, then a retainer</h3>
+        <div class="price-amount">$1.5k<span>&nbsp;+&nbsp;retainer</span></div>
+        <p class="price-desc">For bigger, more involved projects — document processing, multi-step workflows, custom integrations — scoped and priced after we talk.</p>
+        <ul class="price-list">
+          <li>Discovery call and scoping</li>
+          <li>Built around exactly what you need</li>
+          <li>Tested against your real data before launch</li>
+          <li>Monthly retainer covers monitoring and fixes</li>
+        </ul>
+        <form class="mini-form" data-tier="Big projects">
+          <textarea placeholder="Tell us in a few words what you need" required></textarea>
+          <button type="submit" class="btn-secondary" style="width:100%; text-align:center;">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band" id="contact">
+  <div class="wrap">
+    <h2>Tell us what's eating your time.</h2>
+    <p>One call. No obligation. If we can't build it well, we'll tell you.</p>
+    <a href="mailto:contact@intelli2.com" class="btn-primary" style="background:white; color:var(--violet-deep);">Email us at contact@intelli2.com</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M8 13V6.5a1.5 1.5 0 0 1 3 0V11" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 11V4.8a1.5 1.5 0 0 1 3 0V11" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 11.2V6.3a1.5 1.5 0 0 1 3 0V13" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13c-1.6-1.1-3.2-.6-3.6.6-.5 1.4.7 2 1.6 2.7l3 2.4c1 .8 2.2 1.3 3.5 1.3h1.8c2.4 0 4.2-1.9 4.2-4.3V9.7a1.4 1.4 0 0 0-2.8 0" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          TaskBuddy AI
+        </div>
+        <p>Custom AI agents for small and medium businesses — built once, run quietly, maintained by us.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Ohio Office</h4>
+        <address>TaskBuddy AI<br>Delaware, Ohio<br>United States</address>
+      </div>
+      <div class="footer-col">
+        <h4>UK Office</h4>
+        <address>TaskBuddy AI<br>Ruskington<br>United Kingdom</address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TaskBuddy AI. All rights reserved.</span>
+      <span>contact@intelli2.com</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.mini-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const tier = form.dataset.tier;
+      const message = form.querySelector('textarea').value.trim();
+      if (!message) return;
+      const subject = encodeURIComponent(`TaskBuddy AI — ${tier} inquiry`);
+      const body = encodeURIComponent(`${message}\n\n— sent from taskbuddyai.com (${tier})`);
+      window.location.href = `mailto:contact@intelli2.com?subject=${subject}&body=${body}`;
+    });
+  });
+</script>
+</body>
+</html>
