@@ -102,6 +102,9 @@
     border-radius: 999px;
     font-weight: 600;
     font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
     transition: transform 0.15s ease, background 0.15s ease;
   }
   .nav-cta:hover { background: var(--violet); transform: translateY(-1px); }
@@ -536,6 +539,7 @@
   .price-card.featured .price-list li::before { background: var(--mint); }
 
   .mini-form { display: flex; flex-direction: column; gap: 10px; }
+  .mini-form input,
   .mini-form textarea {
     resize: vertical;
     min-height: 68px;
@@ -547,16 +551,90 @@
     color: var(--ink);
     background: white;
   }
+  .mini-form input { min-height: auto; }
+  .price-card.featured .mini-form input,
   .price-card.featured .mini-form textarea {
     background: rgba(255,255,255,0.08);
     border-color: rgba(255,255,255,0.25);
     color: white;
   }
+  .price-card.featured .mini-form input::placeholder,
   .price-card.featured .mini-form textarea::placeholder { color: rgba(255,255,255,0.5); }
+  .mini-form input:focus,
   .mini-form textarea:focus { outline: none; border-color: var(--coral); }
   .mini-form button { cursor: pointer; border: none; }
   .mini-note { font-size: 0.78rem; color: var(--ink-soft); }
   .price-card.featured .mini-note { color: rgba(255,255,255,0.55); }
+
+  /* ---------- CONTACT MODAL ---------- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(21,20,43,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: white;
+    border-radius: 18px;
+    padding: 34px;
+    max-width: 440px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 30px 60px -20px rgba(21,20,43,0.35);
+    transform: translateY(12px);
+    transition: transform 0.2s ease;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--ink-soft);
+    border-radius: 8px;
+  }
+  .modal-close:hover { color: var(--ink); background: var(--base-warm); }
+  .modal h3 { font-size: 1.35rem; margin-bottom: 8px; padding-right: 24px; }
+  .modal-sub { color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 22px; }
+  .contact-form { display: flex; flex-direction: column; gap: 14px; }
+  .contact-form label {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .contact-form .optional-tag { font-weight: 400; opacity: 0.75; }
+  .contact-form input,
+  .contact-form textarea {
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .contact-form textarea { resize: vertical; min-height: 80px; }
+  .contact-form input:focus,
+  .contact-form textarea:focus { outline: none; border-color: var(--coral); }
+  .contact-form button { width: 100%; text-align: center; margin-top: 4px; }
 
   /* ---------- CTA BAND ---------- */
   .cta-band {
@@ -601,9 +679,35 @@
       <a href="#pricing">Pricing</a>
       <a href="#contact">Contact</a>
     </nav>
-    <a href="#contact" class="nav-cta">Book a call</a>
+    <button type="button" class="nav-cta" id="openContactModal">Contact</button>
   </div>
 </header>
+
+<div class="modal-overlay" id="contactModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+    <button type="button" class="modal-close" id="contactModalClose" aria-label="Close">&times;</button>
+    <h3 id="contactModalTitle">Tell us what you need</h3>
+    <p class="modal-sub">One call. No obligation. If we can't build it well, we'll tell you.</p>
+    <form class="contact-form" id="contactModalForm">
+      <label>Name / Business name
+        <input type="text" name="name" required>
+      </label>
+      <label>Phone number
+        <input type="tel" name="phone" required>
+      </label>
+      <label>Email <span class="optional-tag">(optional)</span>
+        <input type="email" name="email">
+      </label>
+      <label>Type of business <span class="optional-tag">(optional)</span>
+        <input type="text" name="business_type">
+      </label>
+      <label>Message
+        <textarea name="message" placeholder="Tell us what you need" required></textarea>
+      </label>
+      <button type="submit" class="btn-primary">Send</button>
+    </form>
+  </div>
+</div>
 
 <section class="hero">
   <div class="wrap hero-grid">
@@ -783,7 +887,11 @@
           <li>Cancel anytime — no long build to walk away from</li>
         </ul>
         <form class="mini-form" data-tier="Simple automations">
-          <textarea placeholder="Tell us in a few words what you need" required></textarea>
+          <input type="text" name="name" placeholder="Name / Business name" required>
+          <input type="tel" name="phone" placeholder="Phone number" required>
+          <input type="email" name="email" placeholder="Email (optional)">
+          <input type="text" name="business_type" placeholder="Type of business (optional)">
+          <textarea name="message" placeholder="Tell us in a few words what you need" required></textarea>
           <button type="submit" class="btn-primary" style="background:white; color:var(--ink); width:100%; text-align:center; border:none;">Send</button>
         </form>
       </div>
@@ -799,7 +907,11 @@
           <li>Monthly retainer covers monitoring and fixes</li>
         </ul>
         <form class="mini-form" data-tier="Big projects">
-          <textarea placeholder="Tell us in a few words what you need" required></textarea>
+          <input type="text" name="name" placeholder="Name / Business name" required>
+          <input type="tel" name="phone" placeholder="Phone number" required>
+          <input type="email" name="email" placeholder="Email (optional)">
+          <input type="text" name="business_type" placeholder="Type of business (optional)">
+          <textarea name="message" placeholder="Tell us in a few words what you need" required></textarea>
           <button type="submit" class="btn-secondary" style="width:100%; text-align:center;">Send</button>
         </form>
       </div>
@@ -844,15 +956,70 @@
 </footer>
 
 <script>
+  function sendInquiry(form, tier) {
+    const data = new FormData(form);
+    const name = (data.get('name') || '').trim();
+    const phone = (data.get('phone') || '').trim();
+    const email = (data.get('email') || '').trim();
+    const businessType = (data.get('business_type') || '').trim();
+    const message = (data.get('message') || '').trim();
+    if (!name || !phone || !message) return;
+
+    const label = tier || 'General';
+    const subject = encodeURIComponent(`TaskBuddy AI — ${label} inquiry`);
+    const lines = [
+      `Name/Business: ${name}`,
+      `Phone: ${phone}`,
+      email ? `Email: ${email}` : null,
+      businessType ? `Type of business: ${businessType}` : null,
+      '',
+      message,
+      '',
+      `— sent from taskbuddyai.com (${label})`
+    ].filter(line => line !== null).join('\n');
+
+    window.location.href = `mailto:contact@intelli2.com?subject=${subject}&body=${encodeURIComponent(lines)}`;
+  }
+
   document.querySelectorAll('.mini-form').forEach(form => {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      const tier = form.dataset.tier;
-      const message = form.querySelector('textarea').value.trim();
-      if (!message) return;
-      const subject = encodeURIComponent(`TaskBuddy AI — ${tier} inquiry`);
-      const body = encodeURIComponent(`${message}\n\n— sent from taskbuddyai.com (${tier})`);
-      window.location.href = `mailto:contact@intelli2.com?subject=${subject}&body=${body}`;
+      sendInquiry(form, form.dataset.tier);
+    });
+  });
+
+  const contactOverlay = document.getElementById('contactModalOverlay');
+  const contactOpenBtn = document.getElementById('openContactModal');
+  const contactCloseBtn = document.getElementById('contactModalClose');
+  const contactForm = document.getElementById('contactModalForm');
+
+  function openContactModal() {
+    contactOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeContactModal() {
+    contactOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  contactOpenBtn.addEventListener('click', openContactModal);
+  contactCloseBtn.addEventListener('click', closeContactModal);
+  contactOverlay.addEventListener('click', function (e) {
+    if (e.target === contactOverlay) closeContactModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && contactOverlay.classList.contains('open')) closeContactModal();
+  });
+  contactForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    sendInquiry(contactForm, 'General');
+    closeContactModal();
+  });
+
+  document.querySelectorAll('a[href="#contact"]').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      openContactModal();
     });
   });
 </script>
